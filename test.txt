@@ -1,0 +1,45 @@
+int a = 2;
+int b = a+4;
+const int c=3;
+bool d = TRUE;
+bool e = 0;
+char f ='a';
+float h = 10.0;
+
+
+struct ana {
+    float w;
+    int c;
+    int a;
+} ok;
+ok.a=4;
+
+array int b[20];
+array b[15]=3;
+array b[2]=5;
+print b[15];
+print b[2];
+
+string sir1 = "hello";
+string sir2 = "hello world";
+compare(sir1, sir2);
+substring(sir2, sir1);
+copy(sir1, sir2);
+compare(sir1, sir2);
+
+if(a==2 || b<=3 && c>=2)
+{
+  int if_var = 1;
+  
+}
+else 
+{
+  char ad = 'w';
+}
+
+while(a == 2)
+{   
+    flot a = 12.4;
+    print a;
+}
+print a;
