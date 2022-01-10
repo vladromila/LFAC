@@ -8,3 +8,5 @@ rmFiles:
 	rm y.tab.c 
 	rm y.tab.h 
 	rm output
+	rm symbol_table_functions.txt
+	rm symbol_table.txt

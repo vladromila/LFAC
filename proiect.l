@@ -42,7 +42,7 @@ linefeed \n
 "+"         return PLUS;
 "TRUE"      {yylval.value = strdup(yytext); return BOOL_VALUE;}
 "FALSE"     {yylval.value = strdup(yytext); return BOOL_VALUE;}
-"print"     return PRINT;
+"Print"     return PRINT;
 "*"         return MULTIPLY;
 "-"         return MINUS;
 "/"         return DIVIDE;

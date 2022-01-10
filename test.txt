@@ -1,45 +1,81 @@
-int a = 2;
-int b = a+4;
-const int c=3;
-bool d = TRUE;
-bool e = 0;
-char f ='a';
-float h = 10.0;
+struct testStruct {
+  float v1;
+  int v2;
+  int v3;
+} ts;
 
 
-struct ana {
-    float w;
-    int c;
-    int a;
-} ok;
-ok.a=4;
+ts.v1=10.1;
+ts.v2=15;
+ts.v3=9;
 
-array int b[20];
-array b[15]=3;
-array b[2]=5;
-print b[15];
-print b[2];
+int a=10;
+int b=11;
+int c=a-b;
 
-string sir1 = "hello";
-string sir2 = "hello world";
-compare(sir1, sir2);
-substring(sir2, sir1);
-copy(sir1, sir2);
-compare(sir1, sir2);
+int globalVariable=5;
 
-if(a==2 || b<=3 && c>=2)
-{
-  int if_var = 1;
-  
+function int check_nr (3, int a, int b, int c)
+{  
+  int intFunctionVariable=10;
 }
-else 
-{
-  char ad = 'w';
+function float check_nr (3, int a, int b, int c)
+{ 
+  int z=10-2+1;
+  int globalVariable=6;
+  Print ("Test if functions saves variable. ", z);
+  Print ("Test if functions has access to global variables. ", globalVariable);
 }
 
-while(a == 2)
+call check_nr(a, b, 7+2);
+call check_nr(call check_nr(a+2, 2+4, c+5));
+
+Print ("Simple variable print ",c);
+
+string testString1 = "LFACTest";
+string testString2 = "LFACTe";
+compare(testString1, testString2);
+substring(testString1, testString2);
+copy(testString1, testString2);
+compare(testString1, testString2);
+
+
+if(c<1 || a >= 10 || b<11)
+{
+  bool variableDeclaredInIfStatement = TRUE;
+  int testIfIfStatementSavesVariable=111;
+  Print ("IF statement works with local variables. ", testIfIfStatementSavesVariable);
+  Print ("IF statement works with local global variables. ", globalVariable);
+
+}
+else
+{
+  bool varialeDeclaredInElseStatement = FALSE;
+  int testIfElseStatementSavesVariable=10/10;
+  Print ("ELSE statement works. ",testIfElseStatementSavesVariable);
+}
+
+int v=2;
+
+while(v == 2)
 {   
-    flot a = 12.4;
-    print a;
+    bool variableDeclaredInWhileLoop = TRUE;
+    float testIfWileSavesVariable = 12.4;
+    Print ( "WHILE loop works" ,testIfWileSavesVariable);
 }
-print a;
+
+int v1=0;
+int v2=0;
+
+for(int i = v1, i <=v2, i=i+1)
+{   
+    bool variableDeclaredInForLoop = TRUE;
+    float testIfForSavesVariable = 4.12;
+    Print ("FOR loop works. ",testIfForSavesVariable);
+}
+
+array int testArray[20];
+array testArray[15]=3;
+array testArray[2]=5;
+
+Print ( "Arrays work. ",testArray[15]);

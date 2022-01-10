@@ -11,6 +11,17 @@ struct symbol_table
     char scope[256];
 };
 
+struct AST_Node
+{
+    int type;
+    char value[256];
+    struct symbol_table node;
+    struct AST_Node *left;
+    struct AST_Node *right;
+};
+
+
+
 struct symbol_table symbols[50];
 int no_symbols = 0;
 
@@ -159,4 +170,264 @@ void push_variables(char data_type[256], char name[256], char value[256])
     }
     strcpy(str[nr_struct].variables[x].value, value);
     str[nr_struct].index++;
+}
+
+void push_symbol(char data_type[256], char name[256], char value[256], char scope[256])
+{
+    int x = no_symbols;
+    strcpy(symbols[x].data_type, data_type);
+    strcpy(symbols[x].name, name);
+
+    // string quotes removed
+    if (strstr(data_type, "string") || strstr(data_type, "char"))
+    {
+        *value++;
+        value[strlen(value) - 1] = '\0';
+    }
+    if (strstr(data_type, "bool"))
+    {
+        if (strcmp(value, "0") == 0)
+            strcpy(value, "FALSE");
+        if (strcmp(value, "1") == 0)
+            strcpy(value, "TRUE");
+    }
+    strcpy(symbols[x].value, value);
+    strcpy(symbols[x].scope, scope);
+
+    no_symbols++;
+}
+
+int lookup(char name[256])
+{
+    // check if variable exists. exists?1:0
+
+    for (int i = 0; i < no_symbols; i++)
+        if (strcmp(symbols[i].name, name) == 0) // daca gasim in tabela
+            return 1;
+
+    return 0;
+}
+
+int str_includes(char value[256], char substring[256])
+{
+    if (strstr(value, substring))
+        return 1;
+    return 0;
+}
+int str_cmp(char value[256], char value2[256])
+{
+    char buff[256];
+    for (int i = 0; i < no_symbols; i++)
+        if (strcmp(symbols[i].value, value) == 0) // daca gasim in tabela
+            strcpy(buff, symbols[i].name);
+
+    if (strcmp(value, value2) == 0)
+        return 1;
+    return 0;
+}
+
+char *get_value(char name[256])
+{
+    for (int i = 0; i < no_symbols; i++)
+        if (strcmp(symbols[i].name, name) == 0)
+            return symbols[i].value;
+}
+char *get_scope(char name[256])
+{
+    for (int i = 0; i < no_symbols; i++)
+        if (strcmp(symbols[i].name, name) == 0)
+            return symbols[i].scope;
+}
+char *get_data_type(char name[256])
+{
+    for (int i = 0; i < no_symbols; i++)
+        if (strcmp(symbols[i].name, name) == 0)
+            return symbols[i].data_type;
+}
+
+char *value_by_scope(char name[256], char scope[256])
+{
+    for (int i = 0; i < no_symbols; i++)
+        if (strcmp(symbols[i].name, name) == 0 && strcmp(symbols[i].scope, scope) == 0)
+            return symbols[i].value;
+    return NULL;
+}
+
+int lookup_function_variable(char name[256])
+{
+    for (int i = 0; i < no_functions; i++)
+        for (int j = 0; j < functions[i].index; j++)
+        {
+            if (strcmp(functions[i].variables[j].name, name) == 0)
+            {
+                return 1;
+            }
+        }
+    return 0;
+}
+
+char *variable_value_by_scope(char name[256])
+{
+    for (int i = 0; i < no_functions; i++)
+        for (int j = 0; i < functions[i].index; j++)
+        {
+            if (strcmp(functions[i].variables[j].name, name) == 0)
+            {
+                return functions[i].variables[j].value;
+            }
+        }
+}
+
+void print_string(char string[256])
+{ // removes string quotes and prints static strings;
+    *string++;
+    string[strlen(string) - 1] = '\0';
+    printf("%s\n", string);
+}
+
+int check_data_type(char data_type[256], char value[256])
+{
+    if (strstr("const int", data_type))
+    {
+        for (int i = 0; i < strlen(value); i++)
+            if (!isdigit(value[i]) && value[i] != '-' && value[i] != '+')
+                return 0;
+    }
+
+    if (strstr("const float", data_type))
+    {
+        int ok = 0;
+        for (int i = 0; i < strlen(value); i++)
+        {
+            if (value[i] == '.')
+                ok = 1;
+        }
+
+        if (ok == 0)
+            return 0;
+        for (int i = 0; i < strlen(value); i++)
+        {
+            if (!isdigit(value[i]) && value[i] != '.')
+                return 0;
+        }
+    }
+
+    if (strstr("const bool", data_type))
+    {
+        if (strcmp(value, "TRUE") != 0 && strcmp(value, "FALSE") != 0 && strcmp(value, "1") != 0 && strcmp(value, "0") != 0)
+            return 0;
+    }
+    if (strstr("const string", data_type))
+    {
+        if (value[0] != '\"' || value[strlen(value) - 1] != '\"')
+            return 0;
+    }
+    if (strstr("const char", data_type))
+    {
+        if (value[0] != '\'' || value[strlen(value) - 1] != '\'')
+            return 0;
+    }
+    return 1;
+}
+
+void reassign_value(char name[256], char value[256])
+{
+    for (int i = 0; i < no_symbols; i++)
+        if (strcmp(symbols[i].name, name) == 0)
+            strcpy(symbols[i].value, value);
+}
+
+// array related functions
+
+void push_array(char data_type[256], char name[256], char int_value[256], char scope[256])
+{
+    int x = no_arrays;
+    strcpy(arrays[x].data_type, data_type);
+    strcpy(arrays[x].name, name);
+    strcpy(arrays[x].scope, scope);
+    int a = atoi(int_value);
+    arrays[x].max_index = a;
+    no_arrays++;
+}
+
+void push_array_element(char name[256], char index[256], char value[256])
+{
+    int x = no_arrays;
+    int ind = atoi(index);
+    int val = atoi(value);
+    for (int i = 0; i < x; i++)
+        if (strcmp(arrays[i].name, name) == 0)
+            arrays[i].array[ind] = val;
+}
+
+int check_inside(char name[256], char index[256])
+{
+    int x = no_arrays;
+    int ind = atoi(index);
+    for (int i = 0; i < x; i++)
+        if (strcmp(arrays[i].name, name) == 0)
+            if (ind < arrays[i].max_index)
+                return 1;
+    return 0;
+}
+int lookup_array(char name[256])
+{
+    int x = no_arrays;
+    for (int i = 0; i < x; i++)
+        if (strcmp(arrays[i].name, name) == 0)
+            return 1;
+    return 0;
+}
+
+int get_element(char name[256], char index[256])
+{
+    int ind = atoi(index);
+    int x = no_arrays;
+    for (int i = 0; i < x; i++)
+        if (strcmp(arrays[i].name, name) == 0)
+            return arrays[i].array[ind];
+}
+
+void print_to_file()
+{
+    FILE *file;
+    file = fopen("symbol_table.txt", "w");
+    fprintf(file, "SYMBOL TABLE:\n\n");
+    for (int i = 0; i < no_symbols; i++)
+        fprintf(file, "data_type: %s, name: %s, value:%s, scope:%s\n", symbols[i].data_type, symbols[i].name, symbols[i].value, symbols[i].scope);
+
+    fprintf(file, "\nSTRUCT TABLE:\n\n");
+    for (int i = 0; i < nr_struct; i++)
+    {
+        fprintf(file, "struct_name: %s\n", str[i].name);
+        for (int j = 0; j < str[i].index; j++)
+            fprintf(file, "data_type : %s , name : %s , value : %s\n", str[i].variables[j].data_type, str[i].variables[j].name, str[i].variables[j].value);
+    }
+    fprintf(file, "\nARRAY TABLE:\n\n");
+    for (int i = 0; i < no_arrays; i++)
+    {
+        fprintf(file, "data_type: %s, ", arrays[i].data_type);
+        fprintf(file, "name: %s, ", arrays[i].name);
+        fprintf(file, "no_elements: %d, scope: %s ", arrays[i].max_index, arrays[i].scope);
+        fprintf(file, "values:[ ");
+        for (int j = 0; j < arrays[i].max_index; j++)
+            fprintf(file, "%d ", arrays[i].array[j]);
+        fprintf(file, "]\n");
+    }
+    fclose(file);
+
+    file = fopen("symbol_table_functions.txt", "w");
+    fprintf(file, "\nFUNCTIONS TABLE:\n");
+    for (int i = 0; i < no_functions; i++)
+    {
+
+        fprintf(file, "\ndata_type: %s, ", functions[i].data_type);
+        fprintf(file, "name: %s, ", functions[i].name);
+        fprintf(file, "scope: %s\n", functions[i].scope);
+        fprintf(file, "\n     FUNCTION VARIABLES: \n");
+        for (int j = 0; j < functions[i - 1].index; j++)
+            fprintf(file, "     scope: %s, data_type : %s, name : %s, value : %s\n", functions[i - 1].variables[j].scope, functions[i - 1].variables[j].data_type, functions[i - 1].variables[j].name, functions[i - 1].variables[j].value);
+    }
+
+    fclose(file);
 }
